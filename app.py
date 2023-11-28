@@ -15,7 +15,7 @@ def main():
 
     # Create a bigger box (Epic)
     epic_box_image = Image.new('RGB', (400, 400), color='orange')
-    st.image(epic_box_image, caption="Epic Box", use_container_width=True)
+    st.image(epic_box_image, caption="Epic Box")
 
     # Get the number of boxes from the user
     num_boxes = st.slider("Select the number of Feature Boxes:", min_value=1, max_value=10, value=5)
@@ -26,11 +26,11 @@ def main():
     # Display Feature Boxes
     for box in boxes:
         box_image = Image.new('RGB', (int(box['size'] * 400), int(box['size'] * 400)), color='violet')
-        st.image(box_image, caption="Feature", use_container_width=True, key=f"box_{box['id']}")
+        st.image(box_image, caption="Feature")
 
     # Create a Release Box (Green)
     release_box_image = Image.new('RGB', (400, 400), color='green')
-    st.image(release_box_image, caption="Release Box", use_container_width=True)
+    st.image(release_box_image, caption="Release Box")
 
     # Arrow buttons for movement
     st.sidebar.markdown("# Controls")
@@ -68,7 +68,7 @@ def main():
         box_image = Image.new('RGB', (int(box['size'] * 400), int(box['size'] * 400)), color='violet')
         epic_box_image.paste(box_image, (x_pos, y_pos))
 
-    st.image(epic_box_image, caption="Epic Box with Feature Boxes", use_container_width=True)
+    st.image(epic_box_image, caption="Epic Box with Feature Boxes")
 
 if __name__ == "__main__":
     main()
