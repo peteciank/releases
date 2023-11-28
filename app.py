@@ -1,9 +1,12 @@
 import streamlit as st
+from PIL import Image
+import io
 import random
 
 # Function to generate a random configuration of boxes
 def generate_boxes(num_boxes):
-    boxes = [{'id': i, 'size': random.uniform(0.1, 0.5)} for i in range(num_boxes)]
+    boxes = [{'id': i, 'size': random.uniform(0.1, 0.5), 'position': {'x': random.uniform(0, 1), 'y': random.uniform(0, 1)}}
+             for i in range(num_boxes)]
     return boxes
 
 # Streamlit app
@@ -11,7 +14,8 @@ def main():
     st.title("Box Game")
 
     # Create a bigger box (Epic)
-    st.markdown("<h2 style='text-align: center; color: orange;'>Epic</h2>", unsafe_allow_html=True)
+    epic_box_image = Image.new('RGB', (400, 400), color='orange')
+    st.image(epic_box_image, caption="Epic Box", use_container_width=True)
 
     # Get the number of boxes from the user
     num_boxes = st.slider("Select the number of Feature Boxes:", min_value=1, max_value=10, value=5)
@@ -21,67 +25,50 @@ def main():
 
     # Display Feature Boxes
     for box in boxes:
-        st.markdown(
-            f"<div style='width: {box['size']*300}px; height: {box['size']*300}px; background-color: violet; "
-            f"display: inline-block; text-align: center; margin: 10px;'>Feature</div>",
-            unsafe_allow_html=True
-        )
+        box_image = Image.new('RGB', (int(box['size'] * 400), int(box['size'] * 400)), color='violet')
+        st.image(box_image, caption="Feature", use_container_width=True, key=f"box_{box['id']}")
 
     # Create a Release Box (Green)
-    release_box = st.markdown("<div style='width: 300px; height: 300px; background-color: green; "
-                              "text-align: center; margin-top: 20px;'>Release Box</div>", unsafe_allow_html=True)
+    release_box_image = Image.new('RGB', (400, 400), color='green')
+    st.image(release_box_image, caption="Release Box", use_container_width=True)
 
-    # Drag and drop functionality
-    drop_box_id = 'release_box'
-    dragged_box_id = None
+    # Arrow buttons for movement
+    st.sidebar.markdown("# Controls")
+    selected_box_id = st.sidebar.radio("Select a Feature Box:", [box['id'] for box in boxes], index=0)
 
+    col1, col2, col3 = st.sidebar.beta_columns(3)
+    if col2.button("↑"):
+        for box in boxes:
+            if box['id'] == selected_box_id:
+                box['position']['y'] = max(0, box['position']['y'] - 0.1)
+        st.experimental_rerun()
+
+    if col1.button("←"):
+        for box in boxes:
+            if box['id'] == selected_box_id:
+                box['position']['x'] = max(0, box['position']['x'] - 0.1)
+        st.experimental_rerun()
+
+    if col3.button("→"):
+        for box in boxes:
+            if box['id'] == selected_box_id:
+                box['position']['x'] = min(1 - box['size'], box['position']['x'] + 0.1)
+        st.experimental_rerun()
+
+    if col2.button("↓"):
+        for box in boxes:
+            if box['id'] == selected_box_id:
+                box['position']['y'] = min(1 - box['size'], box['position']['y'] + 0.1)
+        st.experimental_rerun()
+
+    # Render the updated boxes
     for box in boxes:
-        box_id = f"box_{box['id']}"
-        box_html = f"<div id='{box_id}' draggable='true' " \
-                   f"ondragstart='dragStart(event)' ondragend='dragEnd(event)' " \
-                   f"style='width: {box['size']*300}px; height: {box['size']*300}px; " \
-                   f"background-color: violet; display: inline-block; text-align: center; margin: 10px;'>Feature</div>"
+        x_pos = int(box['position']['x'] * 400)
+        y_pos = int(box['position']['y'] * 400)
+        box_image = Image.new('RGB', (int(box['size'] * 400), int(box['size'] * 400)), color='violet')
+        epic_box_image.paste(box_image, (x_pos, y_pos))
 
-        st.markdown(box_html, unsafe_allow_html=True)
-
-    script = """
-        <script>
-            function allowDrop(event) {
-                event.preventDefault();
-            }
-
-            function dragStart(event) {
-                event.dataTransfer.setData("text", event.target.id);
-            }
-
-            function dragEnd(event) {
-                // Check if the dragged box is inside the release box
-                const releaseBox = document.getElementById("release_box");
-                const releaseBoxRect = releaseBox.getBoundingClientRect();
-
-                const draggedBox = document.getElementById(event.target.id);
-                const draggedBoxRect = draggedBox.getBoundingClientRect();
-
-                if (
-                    draggedBoxRect.top >= releaseBoxRect.top &&
-                    draggedBoxRect.bottom <= releaseBoxRect.bottom &&
-                    draggedBoxRect.left >= releaseBoxRect.left &&
-                    draggedBoxRect.right <= releaseBoxRect.right
-                ) {
-                    draggedBox.style.display = "none";
-                }
-            }
-
-            function drop(event) {
-                event.preventDefault();
-                var data = event.dataTransfer.getData("text");
-                var draggedElement = document.getElementById(data);
-                event.target.appendChild(draggedElement);
-            }
-        </script>
-    """
-
-    st.markdown(script, unsafe_allow_html=True)
+    st.image(epic_box_image, caption="Epic Box with Feature Boxes", use_container_width=True)
 
 if __name__ == "__main__":
     main()
