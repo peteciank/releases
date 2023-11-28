@@ -1,6 +1,3 @@
-Certainly! Below is a simple example of a Python and Streamlit code for the game you described. Make sure you have Streamlit installed (`pip install streamlit`) before running the code.
-
-```python
 import streamlit as st
 import random
 
@@ -88,6 +85,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-```
-
-This code creates a Streamlit app with a draggable box interface. The user can choose the number of "Feature Boxes," and the goal is to drag these boxes into the "Release Box." The sizes and positions of the boxes are randomly generated. The JavaScript functions enable drag and drop functionality.
