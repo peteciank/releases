@@ -36,7 +36,7 @@ def main():
     st.sidebar.markdown("# Controls")
     selected_box_id = st.sidebar.radio("Select a Feature Box:", [box['id'] for box in boxes], index=0)
 
-    col1, col2, col3 = st.sidebar.beta_columns(3)
+    col1, col2, col3 = st.sidebar.columns(3)
     if col2.button("↑"):
         for box in boxes:
             if box['id'] == selected_box_id:
